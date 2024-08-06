@@ -26,7 +26,7 @@ fn configure_kafka_ssl(mut kafka_config: ClientConfig, config: &CharcoalConfig) 
     } else if config.sasl.is_some() {
         let sasl = config.sasl.clone().unwrap();
         kafka_config
-            .set("security.protocol", "SASL_SSL")
+            .set("security.protocol", "SASL_PLAINTEXT")
             .set("sasl.mechanisms", "PLAIN")
             .set("sasl.username", sasl.kafka_username)
             .set("sasl.password", sasl.kafka_password);
