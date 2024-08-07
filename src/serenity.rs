@@ -27,7 +27,7 @@ impl SerenityInit for ClientBuilder {
         self.type_map_insert::<CharcoalKey>(executor::block_on(c))
     }
 }
-
+#[macro_export]
 macro_rules! get_handler_from_interaction_mutable {
     ($ctx: expr, $interaction: expr, $reference: ident) => {
         let r = $ctx.data.read().await;
