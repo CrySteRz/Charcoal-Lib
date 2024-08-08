@@ -33,7 +33,14 @@ impl SerenityInit for ClientBuilder {
 macro_rules! get_handler_from_interaction_mutable {
     ($ctx: expr, $interaction: expr, $reference: ident) => {
         let r = $ctx.data.read().await;
-        let guild_id =  $interaction.guild_id;
+        let guild_id = match $interaction.guild_id {
+            Some(gid) => gid,
+            None => {
+                eprintln!("No guild ID found in interaction");
+                return;
+            }
+        };
+        println!("Guild ID: {:?}", guild_id);
         let manager = r.get::<CharcoalKey>();
         let mut mx = manager.unwrap().lock().await;
         let mut players = mx.players.write().await;
