@@ -37,7 +37,7 @@ macro_rules! get_handler_from_interaction_mutable {
         let manager = r.get::<CharcoalKey>();
         let mut mx = manager.unwrap().lock().await;
         let mut players = mx.players.write().await;
-        $reference = players.get_mut(guild_id.unwrap().to_string());
+        $reference = players.get_mut(&guild_id.unwrap().to_string());
     }
 }
 #[macro_export]
