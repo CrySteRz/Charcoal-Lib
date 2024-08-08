@@ -29,7 +29,7 @@ impl SerenityInit for ClientBuilder {
 }
 #[macro_export]
 macro_rules! get_handler_from_interaction_mutable {
-    ($ctx: expr, $interaction: expr, $reference: ident) => {
+    ($ctx: expr, $interaction: expr, $reference: ident) => {{
         let r = $ctx.data.read().await;
         
         // Get the GuildID
@@ -48,7 +48,7 @@ macro_rules! get_handler_from_interaction_mutable {
         // Get the PlayerObject
         let mut players = mx.players.write().await;
         $reference = players.get_mut(&guild_id.to_string());
-    };
+    }};
 }
 
 #[macro_export]
