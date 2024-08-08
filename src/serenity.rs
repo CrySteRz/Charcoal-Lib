@@ -29,25 +29,27 @@ impl SerenityInit for ClientBuilder {
 }
 #[macro_export]
 macro_rules! get_handler_from_interaction_mutable {
-    ($ctx: expr, $interaction: expr, $reference: ident) => {{
-        let r = $ctx.data.read().await;
-        
-        // Get the GuildID
-        let guild_id = match $interaction.guild_id {
-            Some(gid) => gid,
-            None => {
-                eprintln!("No guild ID found in interaction");
-                return;
-            }
-        };
+    ($ctx: expr, $interaction: expr) => {{
+        async {
+            let r = $ctx.data.read().await;
 
-        // Get the charcoal manager from the serenity typemap
-        let manager = r.get::<CharcoalKey>();
-        let mut mx = manager.unwrap().lock().await;
-        
-        // Get the PlayerObject
-        let mut players = mx.players.write().await;
-        $reference = players.get_mut(&guild_id.to_string());
+            // Get the GuildID
+            let guild_id = match $interaction.guild_id {
+                Some(gid) => gid,
+                None => {
+                    eprintln!("No guild ID found in interaction");
+                    return None;
+                }
+            };
+
+            // Get the charcoal manager from the serenity typemap
+            let manager = r.get::<CharcoalKey>();
+            let mut mx = manager.unwrap().lock().await;
+
+            // Get the PlayerObject
+            let mut players = mx.players.write().await;
+            Some(players.get_mut(&guild_id.to_string()))
+        }.await
     }};
 }
 
