@@ -32,8 +32,22 @@ macro_rules! get_handler_from_interaction_mutable {
     ($ctx:expr, $interaction:expr, $reference:ident) => {
         {
             let data = $ctx.data.read().await;
-            let guild_id = $interaction.guild_id.ok_or("No guild ID found in interaction")?;
-            let manager = data.get::<CharcoalKey>().ok_or("Failed to get CharcoalKey from TypeMap")?;
+            let guild_id = match $interaction.guild_id {
+                Some(gid) => gid,
+                None => {
+                    eprintln!("No guild ID found in interaction");
+                    return Err(Box::<dyn std::error::Error + Send + Sync>::from("No guild ID found in interaction"));
+                }
+            };
+
+            let manager = match data.get::<CharcoalKey>() {
+                Some(manager) => manager,
+                None => {
+                    eprintln!("Failed to get CharcoalKey from TypeMap");
+                    return Err(Box::<dyn std::error::Error + Send + Sync>::from("Failed to get CharcoalKey from TypeMap"));
+                }
+            };
+
             let mut mx = manager.lock().await;
             let mut players = mx.players.write().await;
             $reference = players.get_mut(&guild_id.to_string());
