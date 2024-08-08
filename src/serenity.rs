@@ -50,22 +50,16 @@ macro_rules! get_handler_from_interaction_mutable {
 macro_rules! get_handler_from_interaction {
     ($ctx: expr, $interaction: expr, $reference: ident) => {
         let r = $ctx.data.read().await;
-        
-        // Get the GuildID
         let guild_id = match $interaction.guild_id {
             Some(gid) => gid,
             None => {
                 eprintln!("No guild ID found in interaction");
-                return;
+                return Ok(());
             }
         };
-
-        // Get the charcoal manager from the serenity typemap
         let manager = r.get::<CharcoalKey>();
         let mut mx = manager.unwrap().lock().await;
-        
-        // Get the PlayerObject
-        let players = mx.players.read().await;
-        $reference = players.get(&guild_id.to_string());
+        let mut players = mx.players.write().await;
+        $reference = players.get_mut(&guild_id.to_string());
     };
 }
