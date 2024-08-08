@@ -29,30 +29,26 @@ impl SerenityInit for ClientBuilder {
 }
 #[macro_export]
 macro_rules! get_handler_from_interaction_mutable {
-    ($ctx:expr, $interaction:expr, $reference:ident) => {
-        {
-            let data = $ctx.data.read().await;
-            let guild_id = match $interaction.guild_id {
-                Some(gid) => gid,
-                None => {
-                    eprintln!("No guild ID found in interaction");
-                    return Err(Box::<dyn std::error::Error + Send + Sync>::from("No guild ID found in interaction"));
-                }
-            };
+    ($ctx: expr, $interaction: expr, $reference: ident) => {
+        let r = $ctx.data.read().await;
+        
+        // Get the GuildID
+        let guild_id = match $interaction.guild_id {
+            Some(gid) => gid,
+            None => {
+                eprintln!("No guild ID found in interaction");
+                return;
+            }
+        };
 
-            let manager = match data.get::<CharcoalKey>() {
-                Some(manager) => manager,
-                None => {
-                    eprintln!("Failed to get CharcoalKey from TypeMap");
-                    return Err(Box::<dyn std::error::Error + Send + Sync>::from("Failed to get CharcoalKey from TypeMap"));
-                }
-            };
-
-            let mut mx = manager.lock().await;
-            let mut players = mx.players.write().await;
-            $reference = players.get_mut(&guild_id.to_string());
-            Ok::<(), Box<dyn std::error::Error + Send + Sync>>(())
-        }
+        // Get the charcoal manager from the serenity typemap
+        let manager = r.get::<CharcoalKey>();
+        let mut mx = manager.unwrap().lock().await;
+        
+        // Get the PlayerObject
+        let mut players = mx.players.write().await;
+        $reference = players.get_mut(&guild_id.to_string());
+        Ok::<(), Box<dyn std::error::Error + Send + Sync>>(())
     };
 }
 
