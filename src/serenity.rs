@@ -37,7 +37,7 @@ macro_rules! get_handler_from_interaction_mutable {
             Some(gid) => gid,
             None => {
                 eprintln!("No guild ID found in interaction");
-                return;
+                return Ok(());
             }
         };
         let manager = r.get::<CharcoalKey>();
