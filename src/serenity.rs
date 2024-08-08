@@ -27,30 +27,19 @@ impl SerenityInit for ClientBuilder {
         self.type_map_insert::<CharcoalKey>(executor::block_on(c))
     }
 }
+
+
 #[macro_export]
 macro_rules! get_handler_from_interaction_mutable {
-    ($ctx: expr, $interaction: expr) => {{
+    ($ctx: expr, $interaction: expr, $reference: ident) => {
         let r = $ctx.data.read().await;
-
-        // Get the GuildID
-        let guild_id = match $interaction.guild_id {
-            Some(gid) => gid,
-            None => {
-                eprintln!("No guild ID found in interaction");
-                return Err("No guild ID found in interaction");
-            }
-        };
-
-        // Get the charcoal manager from the serenity typemap
+        let guild_id =  $interaction.guild_id;
         let manager = r.get::<CharcoalKey>();
         let mut mx = manager.unwrap().lock().await;
-
-        // Get the PlayerObject
         let mut players = mx.players.write().await;
-        players.get_mut(&guild_id.to_string())
-    }};
+        $reference = players.get_mut(&guild_id.to_string());
+    }
 }
-
 #[macro_export]
 macro_rules! get_handler_from_interaction {
     ($ctx: expr, $interaction: expr, $reference: ident) => {
