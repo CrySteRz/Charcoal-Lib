@@ -48,7 +48,6 @@ macro_rules! get_handler_from_interaction_mutable {
         // Get the PlayerObject
         let mut players = mx.players.write().await;
         $reference = players.get_mut(&guild_id.to_string());
-        Ok::<(), Box<dyn std::error::Error + Send + Sync>>(())
     };
 }
 
